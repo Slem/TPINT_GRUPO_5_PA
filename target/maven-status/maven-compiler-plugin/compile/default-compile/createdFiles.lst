@@ -1,3 +1,4 @@
-frgp\utn\edu\ar\controller\LoginController.class
 frgp\utn\edu\ar\controller\SecurityConfiguration.class
 frgp\utn\edu\ar\controller\CustomAuthenticationSuccessHandler.class
+frgp\utn\edu\ar\controller\LoginController.class
+frgp\utn\edu\ar\controller\PasswordEncoderTest.class
