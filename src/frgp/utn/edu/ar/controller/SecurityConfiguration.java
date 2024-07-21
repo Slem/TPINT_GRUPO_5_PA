@@ -3,20 +3,22 @@ package frgp.utn.edu.ar.controller;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.User;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration{
 	
-	/* tipo de encriptado de seguridad, encargado de hasear las passwords, utilizamos BCRYPT en este ejemplo */
+	/* tipo de encriptado de seguridad, encargado de hasear las passwords, utilizamos BCRYPt */
 	
 	@Bean 
 	public PasswordEncoder passwordEncoder() { 
@@ -26,20 +28,18 @@ public class SecurityConfiguration{
 	/* se cargan los usuarios en memoria, no se usa base de datos, ya tienen las paswords encodeadas a BCRYPT*/
 
 	 @Bean
-	    public UserDetailsService userDetailsService() {
-	        UserDetails admin = User.builder()
-	                .username("admin")
-	                .password(passwordEncoder().encode("admin"))
+	    public InMemoryUserDetailsManager userDetailsService() {
+	        UserDetails admin = User.withUsername("admin")
+	                .password(passwordEncoder().encode("adminpass"))
 	                .roles("ADMIN")
 	                .build();
 
-	        UserDetails cliente = User.builder()
-	                .username("cliente")
-	                .password(passwordEncoder().encode("1234"))
-	                .roles("CLIENTE")
+	        UserDetails client = User.withUsername("client")
+	                .password(passwordEncoder().encode("clientpass"))
+	                .roles("CLIENT")
 	                .build();
 
-	        return new InMemoryUserDetailsManager(admin, cliente);
+	        return new InMemoryUserDetailsManager(admin, client);
 	    }
 	 
 	 /* es el responsable de configurar la seguridad HTTP, incluyendo login, logout y reglas de authorization.
@@ -56,9 +56,8 @@ public class SecurityConfiguration{
 	        http
 	            .authorizeRequests()
 	                .antMatchers("/admin/**").hasRole("ADMIN")
-	                .antMatchers("/cliente/**").hasRole("CLIENTE")
-	                .antMatchers("/login").permitAll()
-	                .anyRequest().authenticated()
+	                .antMatchers("/client/**").hasRole("CLIENT")
+	                .antMatchers("/", "/login").permitAll()
 	                .and()
 	            .formLogin()
 	                .loginPage("/login")
