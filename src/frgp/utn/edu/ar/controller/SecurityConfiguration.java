@@ -30,13 +30,13 @@ public class SecurityConfiguration{
 	 @Bean
 	    public InMemoryUserDetailsManager userDetailsService() {
 	        UserDetails admin = User.withUsername("admin")
-	                .password(passwordEncoder().encode("adminpass"))
+	                .password(passwordEncoder().encode("admin"))
 	                .roles("ADMIN")
 	                .build();
 
-	        UserDetails client = User.withUsername("client")
-	                .password(passwordEncoder().encode("clientpass"))
-	                .roles("CLIENT")
+	        UserDetails client = User.withUsername("cliente")
+	                .password(passwordEncoder().encode("1234"))
+	                .roles("CLIENTE")
 	                .build();
 
 	        return new InMemoryUserDetailsManager(admin, client);
@@ -55,12 +55,12 @@ public class SecurityConfiguration{
 	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	        http
 	            .authorizeRequests()
-	                .antMatchers("/admin/**").hasRole("ADMIN")
-	                .antMatchers("/client/**").hasRole("CLIENT")
-	                .antMatchers("/", "/login").permitAll()
+	                .antMatchers("/Admin/**").hasRole("ADMIN")
+	                .antMatchers("/Cliente/**").hasRole("CLIENTE")
+	                .antMatchers("/", "/Login").permitAll()
 	                .and()
 	            .formLogin()
-	                .loginPage("/login")
+	                .loginPage("/Login")
 	                .defaultSuccessUrl("/default", true)
 	                .permitAll()
 	                .and()
