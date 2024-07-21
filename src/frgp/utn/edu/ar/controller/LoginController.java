@@ -1,45 +1,28 @@
 package frgp.utn.edu.ar.controller;
 
-import javax.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 public class LoginController {
 	
+	/*login page*/
 	
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ModelAndView procesarLogin(@RequestParam("txtUsuario") String usuario,
-                                      @RequestParam("txtPassword") String password,
-                                      HttpSession session) {
-        ModelAndView MV = new ModelAndView();
-        
-        User user = usuarioNegocio.login(usuario);
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+    
+    /* redireccion de los usuarios*/
 
-        if (user != null && user.getPassword().equals(password)) {
-            session.setAttribute("usuario", user);
-            if(user.getTipoUsuario() == 1) {
-            	MV.setViewName("redirect:/Admin");
-            }else if(user.getTipoUsuario() == 2){
-            	MV.setViewName("redirect:/Cliente");
-            }
-        } else {
-            MV.setViewName("Login");
-            MV.addObject("error", "Usuario o contraseña incorrectos");
+    @GetMapping("/default")
+    public String redirigirUsuario(Authentication authentication) {
+        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            return "redirect:/admin";
+        } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENT"))) {
+            return "redirect:/client";
         }
-        
-        return MV;
+        return "redirect:/login";
     }
-	
-	
-	@RequestMapping("/logout")
-    public ModelAndView cerrarSesion(HttpSession session) {
-        session.invalidate();
-        ModelAndView MV = new ModelAndView();
-        MV.setViewName("redirect:/login");
-        return MV;
-    }
-
 }
